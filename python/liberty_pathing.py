@@ -1,25 +1,30 @@
 import urllib2
 import json
-import vim
+#import vim
 
-def _get(url):
-    return urllib2.urlopen(url).read()
+from anytree import Node, RenderTree
 
-def _get_country():
-    try:
-        ip = _get('http://ipinfo.io/ip')
-        json_location_data = _get('http://api.ip2country.info/ip?%s' % ip)
-        location_data = json.loads(json_location_data)
-        return location_data['countryName']
-    except Exception as e:
-        print('Error in sample plugin (%s)' % str(e))
-
-def print_country():
-    print('You seem to be in %s' % _get_country())
-
-
-def insert_country():
-    row, col = vim.current.window.cursor
-    current_line = vim.current.buffer[row-1]
-    new_line = current_line[:col] + _get_country() + current_line[col:]
-    vim.current.buffer[row-1] = new_line
+def index(filename):
+    stack = list()
+    tree = list()
+    is_root = True
+    line_num = 0
+    with open(filename, 'r') as f:
+        for line in f:
+            line_num += 1
+            # start of branch
+            if '{' in line:    
+                name = line.strip().split('{')[0].strip()
+                if is_root:
+                    print("Creating root " + name)
+                    tree.append(Node(name, line=line_num))
+                    stack.append(Node(name, line=line_num))
+                    is_root = False
+                else:
+                    print("Creating node " + name + " with parent node " + str(stack[-1]))
+                    tree.append(Node(name, parent=stack[-1], line=line_num))
+                    stack.append(Node(name, parent=stack[-1], line=line_num))
+            # end of branch
+            elif '}' in line:
+                stack.pop()
+    return tree
