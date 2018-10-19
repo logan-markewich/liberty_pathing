@@ -16,15 +16,14 @@ def index(filename):
             if '{' in line:    
                 name = line.strip().split('{')[0].strip()
                 if is_root:
-                    print("Creating root " + name)
                     tree.append(Node(name, line=line_num))
-                    stack.append(Node(name, line=line_num))
+                    stack.append(tree[0])
                     is_root = False
                 else:
-                    print("Creating node " + name + " with parent node " + str(stack[-1]))
                     tree.append(Node(name, parent=stack[-1], line=line_num))
-                    stack.append(Node(name, parent=stack[-1], line=line_num))
+                    stack.append(tree[-1])
             # end of branch
             elif '}' in line:
                 stack.pop()
-    return tree
+    
+    print(RenderTree(tree[0]))
