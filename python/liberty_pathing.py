@@ -11,46 +11,33 @@ def index_file(filename):
   tree = list()
   is_root = True
   line_num = 0
+  
+  if not('.lib' in filename or '.gz' in filename):
+    return None
+  
   print("Indexing " + filename)  
-  if '.gz' in filename:
-    with gzip.open(filename, 'r') as f:
-      for line in f:
-        line_num += 1
-        # start of branch
-        if '{' in line:    
-          name = line.strip().split('{')[0].strip()
-          if is_root:
-            tree.append(Node(name, startLine=line_num))
-            stack.append(tree[0])
-            is_root = False
-          else:
-            tree.append(Node(name, parent=stack[-1], startLine=line_num))
-            stack.append(tree[-1])
-        # end of branch
-        elif '}' in line:
-          index = tree.index(stack[-1])
-          tree[index].endLine = line_num
-          stack.pop()
-  else:    
-    with open(filename, 'r') as f:
-      for line in f:
-        line_num += 1
-        # start of branch
-        if '{' in line:    
-          name = line.strip().split('{')[0].strip()
-          if is_root:
-            tree.append(Node(name, startLine=line_num))
-            stack.append(tree[0])
-            is_root = False
-          else:
-            tree.append(Node(name, parent=stack[-1], startLine=line_num))
-            stack.append(tree[-1])
-        # end of branch
-        elif '}' in line:
-          index = tree.index(stack[-1])
-          tree[index].endLine = line_num
-          stack.pop()
+  
+  open_func = gzip.open if '.gz' in filename else open
     
+  with open_func(filename, 'r') as f:
+    for line in f:
+      line_num += 1
+      # start of branch
+      if '{' in line:    
+        name = line.strip().split('{')[0].strip()
+        if is_root:
+          tree.append(Node(name, startLine=line_num))
+          stack.append(tree[0])
+          is_root = False
+        else:
+          tree.append(Node(name, parent=stack[-1], startLine=line_num))
+          stack.append(tree[-1])
+      # end of branch
+      elif '}' in line:
+        index = tree.index(stack[-1])
+        tree[index].endLine = line_num
+        stack.pop()
+  print("Indexing Complete!")  
   return tree
 
 def show_branching(tree):
