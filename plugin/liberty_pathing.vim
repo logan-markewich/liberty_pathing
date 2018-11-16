@@ -17,18 +17,14 @@ plugin_root_dir = vim.eval('s:plugin_root_dir')
 python_root_dir = normpath(join(plugin_root_dir, '..', 'python'))
 sys.path.insert(0, python_root_dir)
 from liberty_pathing import *
+filename = vim.eval("expand('%:p')")
+indexed_file = index_file(filename) 
 EOF
 
-function! PrintCountry()
-  python print_country()
+function Get_Location()
+  python show_branching(indexed_file)
 endfunction
 
-command! -nargs=0 PrintCountry call PrintCountry()
-
-function! InsertCountry()
-  python insert_country()
-endfunction
-
-command! -nargs=0 InsertCountry call InsertCountry()
+command! -nargs=0 ShowLocation call Get_Location()
 
 let g:sample_plugin_loaded = 1

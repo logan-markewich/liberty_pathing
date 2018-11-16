@@ -1,10 +1,11 @@
 import urllib2
 import json
-#import vim
+import vim
+import time
 
-from anytree import Node, RenderTree
+from anytree import Node, RenderTree, search
 
-def index(filename):
+def index_file(filename):
     stack = list()
     tree = list()
     is_root = True
@@ -16,14 +17,22 @@ def index(filename):
             if '{' in line:    
                 name = line.strip().split('{')[0].strip()
                 if is_root:
-                    tree.append(Node(name, line=line_num))
+                    tree.append(Node(name, startLine=line_num))
                     stack.append(tree[0])
                     is_root = False
                 else:
-                    tree.append(Node(name, parent=stack[-1], line=line_num))
+                    tree.append(Node(name, parent=stack[-1], startLine=line_num))
                     stack.append(tree[-1])
             # end of branch
             elif '}' in line:
+                index = tree.index(stack[-1])
+                tree[index].endLine = line_num
                 stack.pop()
     
-    print(RenderTree(tree[0]))
+    return tree
+
+def show_branching(tree):
+    row, col = vim.current.window.cursor
+    print(str(search.findall(tree[0], filter_=lambda node: node.startLine <= row and node.endLine >= row)[-1]).split("'")[1])
+    #print(RenderTree(tree[0]))
+    
