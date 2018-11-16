@@ -6,7 +6,9 @@ Eventually, this may support multiple filetypes, but for now is focused on Liber
 # Installation
 To install this plugin, use a plugin manager like [Pathogen](https://github.com/tpope/vim-pathogen).
 Once you have a plugin manager setup, installing is as easy as running the following two commands:
+
 `cd ~/.vim/bundle`
+
 `git clone https://github.com/logan-markewich/liberty_pathing`
 
 # Usage
