@@ -3,6 +3,10 @@ If you don't know what that is, this plugin isn't for you.
 
 Eventually, this may support multiple filetypes, but for now is focused on Liberty files.
 
+# Dependancies
+1. anytree (A python library)
+2. vim compilied with at least Python2 (should also be forwards compatible)
+
 # Installation
 To install this plugin, use a plugin manager like [Pathogen](https://github.com/tpope/vim-pathogen).
 Once you have a plugin manager setup, installing is as easy as running the following two commands:
