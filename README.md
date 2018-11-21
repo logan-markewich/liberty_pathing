@@ -23,4 +23,3 @@ The command will also allow for tab completion so you don't have to type the ent
 # Limitations/Improvements to Make
 1. The indexing is very slow. It would be nice if there was some kind of index cache we could link into and use to avoid reindexing
 every time.
-2. The liberty path could be more accurate if it included some distinct attributes in the timing() groups.
