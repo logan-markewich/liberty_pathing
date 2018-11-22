@@ -1,5 +1,5 @@
-The future intent of this plugin is to provide users an easy way to find their location within a Liberty(.lib) file. 
-If you don't know what that is, this plugin isn't for you.
+The intent of this plugin is to provide users an easy way to find their location within a Liberty(.lib) file. Liberty files are
+large files with a nested structure, and it is easy to get lost when reading or editing one.
 
 Eventually, this may support multiple filetypes, but for now is focused on Liberty files.
 
