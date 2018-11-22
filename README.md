@@ -18,7 +18,11 @@ Once you have a plugin manager setup, installing is as easy as running the follo
 # Usage
 When opening a Liberty File, it will automatically be indexed. After indexing, type `:ShowLocation` anywhere within your file.
 This will display the current location in the statusline of your vim window.
-The command will also allow for tab completion so you don't have to type the entire command.
+
+`:SaveLocation` will save a bookmark csv in your home directory. The path is printed at the bottom when ran. If multiple bookmarks
+are made in the same Liberty file, they will be appended.
+
+The commands will also allow for tab completion so you don't have to type the entire command.
 
 # Limitations/Improvements to Make
 1. The indexing is very slow. It would be nice if there was some kind of index cache we could link into and use to avoid reindexing
