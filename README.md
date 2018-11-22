@@ -25,5 +25,5 @@ are made in the same Liberty file, they will be appended.
 The commands will also allow for tab completion so you don't have to type the entire command.
 
 # Limitations/Improvements to Make
-1. The indexing is very slow. It would be nice if there was some kind of index cache we could link into and use to avoid reindexing
+1. The indexing is very slow on super huge files (~200MB). It would be nice if there was some kind of index cache we could link into and use to avoid reindexing
 every time.
