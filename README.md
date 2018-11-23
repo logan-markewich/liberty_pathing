@@ -25,4 +25,3 @@ The commands will also allow for tab completion so you don't have to type the en
 # Limitations/Improvements to Make
 1. The indexing is very slow on super huge files (~200MB). It would be nice if there was some kind of index cache we could link into and use to avoid reindexing
 every time.
-2. The corner/cell name parsers should be used if available, otherwise the bookmarks don't work
