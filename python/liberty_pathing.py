@@ -4,12 +4,24 @@ import vim
 import time
 import gzip
 import os.path
+import imp
 
 from anytree import Node, RenderTree, search
 from os.path import expanduser
 
-NO_ATTRIBUTES = ['cell', 'library', 'pin', 'bus', 'bundle']
-IGNORE_ATTRIBUTES = ['value', 'sdf_cond', 'miller_cap_fall', 'miller_cap_rise', 'is_needed', 'stage_type']
+# Use parsers if available
+all_parsers = None
+cell_name_parser = None
+unified_parser_file = os.path.expandvars('$SOLIDO_EXTERNAL_PARSERS')
+cell_parser_file = os.path.expandvars('$SOLIDO_CELL_NAME_PARSER')
+
+if unified_parser_file != '$SOLIDO_EXTERNAL_PARSERS':
+  all_parsers = imp.load_source(unified_parser_file.split('/')[-1].split('.')[0], unified_parser_file)
+elif cell_parser_file != '$SOLIDO_CELL_NAME_PARSER':
+  cell_name_parser = imp.load_source(cell_parser_file.split('/')[-1].split('.')[0], cell_parser_file)
+
+NO_ATTRIBUTES = ['cell', 'library', 'pin', 'bus', 'bundle', 'propagated_noise_low', 'propagated_noise_high', 'output_voltage_high', 'output_voltage_low']
+IGNORE_ATTRIBUTES = ['value', 'sdf_cond', 'miller_cap_fall', 'miller_cap_rise', 'is_needed', 'stage_type', 'is_inverting']
 
 def index_file(filename):
   stack = list()
@@ -34,7 +46,7 @@ def index_file(filename):
         while True:
           line = f.next()
           line_num += 1
-          if ':' in line:
+          if ':' in line or ('index' in line and 'vector' in group):
             attributes.add(line.strip())
           else:
             break
@@ -42,8 +54,11 @@ def index_file(filename):
         # Build up timing name with attributes
         name = group.split('(')[0].strip() + '{'
         for attribute in attributes:
-          if not attribute.split(':')[0].strip() in IGNORE_ATTRIBUTES:
-            name += attribute.replace(' ', '').replace(':', '=').replace(';', '').replace('"','') + ', '
+          if ':' in attribute:
+            if not attribute.split(':')[0].strip() in IGNORE_ATTRIBUTES:
+              name += attribute.replace(' ', '').replace(':', '=').replace(';', '').replace('"','') + ', '
+          else:
+            name += attribute.replace(' ', '').replace(';', '').replace('"','') + ', '
         name = name.strip().strip(',') + '}'
 
         tree.append(Node(name, parent=stack[-1], startLine=true_line))
@@ -60,7 +75,15 @@ def index_file(filename):
           stack.pop()
       else:  
         name = line.strip().split('{')[0].strip()
-
+      
+        if 'cell' in name:
+          cell = name.split('(')[1].strip(')').strip()
+          if all_parsers != None:
+            name = 'cell(' + all_parsers.parse_cell_name(cell) +')'
+            name = name.replace('%(','[[').replace(')s',']]')
+          elif cell_name_parser != None:
+            name = 'cell(' + cell_name_parser.parse_cell_name(cell) +')'
+            name = name.replace('%(','[[').replace(')s',']]')
         if is_root:
           name = name.split('(')[0]
           tree.append(Node(name, startLine=line_num))
@@ -102,7 +125,7 @@ def save_location(tree, filename):
 
   # Build the bookmark entry
   base_name = filename.split('/')[-1]
-  library = os.path.splitext(base_name)[0]
+  library = base_name.split('.lib')[0]
   bookmark = ''
   for item in location_list:
     bookmark += item + '/'
