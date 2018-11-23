@@ -9,7 +9,7 @@ from anytree import Node, RenderTree, search
 from os.path import expanduser
 
 NO_ATTRIBUTES = ['cell', 'library', 'pin', 'bus', 'bundle']
-IGNORE_ATTRIBUTES = ['value']
+IGNORE_ATTRIBUTES = ['value', 'sdf_cond', 'miller_cap_fall', 'miller_cap_rise', 'is_needed', 'stage_type']
 
 def index_file(filename):
   stack = list()
@@ -17,12 +17,12 @@ def index_file(filename):
   is_root = True
   line_num = 0
   
-  if not('.lib' in filename or '.gz' in filename):
+  if not(filename.endswith('.lib') or filename.endswith('.gz')):
     return None, None
   
   print("Indexing " + filename)  
   
-  open_func = gzip.open if '.gz' in filename else open
+  open_func = gzip.open if filename.endswith(".gz") else open
   f = open_func(filename, 'r')  
   for line in f:
     line_num += 1
@@ -62,7 +62,6 @@ def index_file(filename):
         name = line.strip().split('{')[0].strip()
 
         if is_root:
-          library = name.split('(')[1].split(')')[0].strip()
           name = name.split('(')[0]
           tree.append(Node(name, startLine=line_num))
           stack.append(tree[0])
@@ -77,7 +76,7 @@ def index_file(filename):
       tree[index].endLine = line_num
       stack.pop()
   print("Indexing Complete!")  
-  return tree, library
+  return tree
 
 
 def show_branching(tree):
@@ -92,7 +91,7 @@ def _get_file_len(fname):
   return i + 1
 
 
-def save_location(tree, filename, library):
+def save_location(tree, filename):
   row, col = vim.current.window.cursor
   location = str(search.findall(tree[0], filter_=lambda node: node.startLine <= row and node.endLine >= row)[-1]).split("'")[1].replace(" ","")
   location_list = location.split('/')
@@ -102,6 +101,8 @@ def save_location(tree, filename, library):
     location_list[-1] = location_list[-1].split('(')[0]
 
   # Build the bookmark entry
+  base_name = filename.split('/')[-1]
+  library = os.path.splitext(base_name)[0]
   bookmark = ''
   for item in location_list:
     bookmark += item + '/'
@@ -111,7 +112,6 @@ def save_location(tree, filename, library):
   bookmark = '"' + bookmark
 
   # Check if bookmark csv already exists
-  base_name = filename.split('/')[-1]
   bookmark_file_path = home = expanduser("~") + '/' + base_name + '_bookmark.csv'
   
   if os.path.isfile(bookmark_file_path):

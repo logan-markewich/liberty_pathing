@@ -18,7 +18,7 @@ python_root_dir = normpath(join(plugin_root_dir, '..', 'python'))
 sys.path.insert(0, python_root_dir)
 from liberty_pathing import *
 filename = vim.eval("expand('%:p')")
-indexed_file, library = index_file(filename) 
+indexed_file = index_file(filename) 
 EOF
 
 function Get_Location()
@@ -26,7 +26,7 @@ function Get_Location()
 endfunction
 
 function Save_Location()
-  python save_location(indexed_file, filename, library)
+  python save_location(indexed_file, filename)
 endfunction
 
 command! -nargs=0 ShowLocation call Get_Location()
