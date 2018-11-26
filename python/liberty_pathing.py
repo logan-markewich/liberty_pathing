@@ -79,11 +79,17 @@ def index_file(filename):
         if 'cell' in name:
           cell = name.split('(')[1].strip(')').strip()
           if all_parsers != None:
-            name = 'cell(' + all_parsers.parse_cell_name(cell) +')'
-            name = name.replace('%(','[[').replace(')s',']]')
+            try:
+              name = 'cell(' + all_parsers.parse_cell_name(cell) +')'
+              name = name.replace('%(','[[').replace(')s',']]')
+            except AttributeError:
+              name = line.strip().split('{')[0].strip()
           elif cell_name_parser != None:
-            name = 'cell(' + cell_name_parser.parse_cell_name(cell) +')'
-            name = name.replace('%(','[[').replace(')s',']]')
+            try:
+              name = 'cell(' + cell_name_parser.parse_cell_name(cell) +')'
+              name = name.replace('%(','[[').replace(')s',']]')
+            except AttributeError:
+              name = line.strip().split('{')[0].strip()
         if is_root:
           name = name.split('(')[0]
           tree.append(Node(name, startLine=line_num))
